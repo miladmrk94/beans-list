@@ -15,8 +15,18 @@
        ];
      });
 
-     // State for hidden meanings
-     const [hiddenMeanings, setHiddenMeanings] = useState({})
+     // State for hidden meanings - initialize with all meanings hidden
+     const [hiddenMeanings, setHiddenMeanings] = useState(() => {
+       const savedHiddenStates = localStorage.getItem('hiddenMeanings');
+       if (savedHiddenStates) {
+         return JSON.parse(savedHiddenStates);
+       }
+       // Create an object with all words hidden by default
+       return wordsList.reduce((acc, word) => {
+         acc[word.id] = true;  // true means hidden
+         return acc;
+       }, {});
+     });
 
      // Load hidden states from localStorage on component mount
      useEffect(() => {
@@ -81,7 +91,7 @@
        }
      };
 
-     // Update file handling function to save to localStorage
+     // Update file handling function to also set hidden states for new words
      const handleFileUpload = (e) => {
        const file = e.target.files[0];
        const reader = new FileReader();
@@ -102,6 +112,14 @@
          // Save to state and localStorage
          setWordsList(formattedData);
          localStorage.setItem('wordsList', JSON.stringify(formattedData));
+
+         // Initialize hidden states for all new words
+         const newHiddenStates = formattedData.reduce((acc, word) => {
+           acc[word.id] = true;  // true means hidden
+           return acc;
+         }, {});
+         setHiddenMeanings(newHiddenStates);
+         localStorage.setItem('hiddenMeanings', JSON.stringify(newHiddenStates));
        };
 
        reader.readAsBinaryString(file);
