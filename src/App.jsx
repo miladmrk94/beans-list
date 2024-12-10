@@ -147,23 +147,23 @@
      };
 
      return (
-       <div className="min-h-screen bg-gray-900 text-gray-100">
-         <div className="container mx-auto p-4">
-           <header className="mb-8 text-center">
-             <h1 className="text-4xl font-bold mb-2 text-violet-400">English-Farsi Dictionary</h1>
+       <div className="min-h-screen bg-gray-950 text-gray-100">
+         <div className="container mx-auto p-2 sm:p-4">
+           <header className="mb-6 sm:mb-8 text-center">
+             <h1 className="text-3xl sm:text-4xl font-bold mb-2 text-violet-400">English-Farsi Dictionary</h1>
              <p className="text-gray-400">Learn and practice vocabulary with ease</p>
            </header>
            
            {/* File upload and clear list section */}
-           <div className="max-w-2xl mx-auto mb-8 bg-gray-800 p-6 rounded-lg shadow-lg">
-             <div className="flex justify-between items-center mb-4">
+           <div className="max-w-2xl mx-auto mb-6 sm:mb-8 bg-gray-800/50 p-4 sm:p-6 rounded-lg shadow-lg">
+             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
                <label className="block text-sm font-medium text-violet-400">
                  Import Words from Excel
                </label>
                {wordsList.length > 0 && (
                  <button
                    onClick={clearWordsList}
-                   className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full
+                   className="w-full sm:w-auto px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full
                             text-sm font-medium transition-colors duration-200"
                  >
                    Clear All Words
@@ -185,11 +185,11 @@
            </div>
 
            {/* Sorting controls */}
-           <div className="max-w-2xl mx-auto mb-6 bg-gray-800 p-4 rounded-lg shadow-lg">
+           <div className="max-w-2xl mx-auto mb-6 bg-gray-800/50 p-4 rounded-lg shadow-lg">
              <label className="block text-sm font-medium text-violet-400 mb-2">
                Sort Words By:
              </label>
-             <div className="flex flex-wrap gap-2">
+             <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                <button
                  onClick={() => setSortType('default')}
                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200
@@ -240,7 +240,7 @@
 
            {/* Words list - update to use sorted words */}
            <div className="max-w-2xl mx-auto">
-             <div className="grid grid-cols-3 gap-4 mb-4 text-center font-medium text-violet-400">
+             <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 text-center font-medium text-violet-400">
                <div>English</div>
                <div>Pronunciation</div>
                <div>Farsi</div>
@@ -249,11 +249,11 @@
              {getSortedWords().map((word) => (
                <div 
                  key={word.id} 
-                 className="mb-3 bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-xl transition-all
+                 className="mb-3 bg-gray-800/50 rounded-lg p-3 sm:p-4 shadow-lg hover:shadow-xl transition-all
                            border border-gray-700 hover:border-violet-500"
                >
-                 <div className="grid grid-cols-3 gap-4 items-center text-center">
-                   <span className="font-medium text-lg">{word.english}</span>
+                 <div className="grid grid-cols-3 gap-2 sm:gap-4 items-center text-center">
+                   <span className="font-medium text-base sm:text-lg break-words">{word.english}</span>
                    <button
                      onClick={() => speakWord(word.english)}
                      className="mx-auto p-3 rounded-full hover:bg-violet-500/20 text-violet-400
@@ -263,8 +263,8 @@
                      🔊
                    </button>
                    <span 
-                     className="cursor-pointer px-4 py-2 rounded-md bg-gray-700 hover:bg-gray-600
-                              transition-colors duration-200"
+                     className="cursor-pointer px-2 sm:px-4 py-2 rounded-md bg-gray-700/50 hover:bg-gray-600
+                              transition-colors duration-200 text-sm sm:text-base"
                      onClick={() => toggleMeaning(word.id)}
                    >
                      {hiddenMeanings[word.id] ? (
