@@ -7,6 +7,7 @@ import { WordsList } from "./components/WordsList";
 import Header from "./components/header";
 import NavigationBar from "./components/NavigationBar";
 import "./App.css";
+import VocabularyAssistant from "./components/VocabularyAssistant";
 
 function App() {
   const {
@@ -52,13 +53,14 @@ function App() {
   return (
     <div className="min-h-screen max-w-md mx-auto">
       <Header />
+
       <div className="container mx-auto p-2 sm:p-4">
         <FileUploader
           onUpload={handleFileUpload}
           wordsList={wordsList}
           onClear={clearWordsList}
         />
-
+        <VocabularyAssistant/>
         <WordSorter sortType={sortType} setSortType={setSortType} />
 
         <WordsList

@@ -1,7 +1,7 @@
 export function usePronunciation() {
   const speakWord = async (word) => {
     try {
-      const API_KEY = 'fkuR1SVr5DNPK9cPRgbEQ9v3oo1or5M3hP4sy1jSXMKx';
+      const API_KEY = 'AUC9q6lEMBcctHk7x4vpUjy7_rUliUi7vMYcb7vvKKsG';
       const API_URL = 'https://api.eu-de.text-to-speech.watson.cloud.ibm.com/instances/25602067-0601-4e93-9200-0bc46112baa2/v1/synthesize';
 
       const response = await fetch(API_URL, {
