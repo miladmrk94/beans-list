@@ -1,8 +1,30 @@
-import { EyeIcon } from "@heroicons/react/20/solid";
-import { EllipsisHorizontalIcon, SpeakerWaveIcon } from "@heroicons/react/24/outline";
+import {
+  EllipsisHorizontalIcon,
+  SpeakerWaveIcon,
+} from "@heroicons/react/24/outline";
 import { EyeDropperIcon } from "@heroicons/react/24/solid";
+import { useState } from "react";
+import VocabularyAssistant from "./VocabularyAssistant";
 
-export function WordsList({ words, hiddenMeanings, onToggleMeaning, onSpeak }) {
+export function WordsList({ words, hiddenMeanings, onToggleMeaning, onSpeak, onUpdateWord }) {
+  const [editingWord, setEditingWord] = useState(null);
+
+  const handleWordClick = (word) => {
+    setEditingWord(word);
+    document.getElementById("my_modal_3").showModal();
+  };
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    const updatedWord = {
+      ...editingWord,
+      english: e.target.english.value,
+      farsi: e.target.farsi.value,
+    };
+    onUpdateWord(updatedWord);
+    document.getElementById("my_modal_3").close();
+  };
+
   if (words.length === 0) {
     return (
       <div className="text-center text-gray-400 mt-8">
@@ -21,7 +43,12 @@ export function WordsList({ words, hiddenMeanings, onToggleMeaning, onSpeak }) {
                     hover:bg-gray-750 transition-all border-t-[1px] border-white border-opacity-5 h-14 overflow-hidden"
         >
           <div className="flex-1 grid grid-cols-[1fr,auto,1fr] gap-4 items-center">
-            <span className="text-gray-100 text-sm text-left">{word.english}</span>
+            <span
+              onClick={() => handleWordClick(word)}
+              className="text-gray-100 text-sm text-left cursor-pointer hover:underline"
+            >
+              {word.english}
+            </span>
 
             <button
               onClick={() => onSpeak(word.english)}
@@ -44,6 +71,48 @@ export function WordsList({ words, hiddenMeanings, onToggleMeaning, onSpeak }) {
           </div>
         </div>
       ))}
+
+      <dialog id="my_modal_3" className="modal modal-bottom">
+        <div className="modal-box p-2">
+          <form onSubmit={handleSave}>
+            <button type="button" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                    onClick={() => document.getElementById("my_modal_3").close()}>
+              ✕
+            </button>
+            <h3 className="font-bold text-lg mb-2">Edit Word</h3>
+            <div className="space-y-4">
+              <div className="flex gap-2 ">
+                <label className="label">
+                  <span className="label-text w-14">English</span>
+                </label>
+                <input
+                  type="text"
+                  name="english"
+                  className="input input-bordered w-full h-9"
+                  defaultValue={editingWord?.english}
+                />
+              </div>
+              <div className="flex gap-2 ">
+                <label className="label">
+                  <span className="label-text w-14">Farsi</span>
+                </label>
+                <input
+                  type="text"
+                  name="farsi"
+                   className="input input-bordered w-full h-9"
+                  defaultValue={editingWord?.farsi}
+                />
+              </div>
+              <div className="modal-action">
+                <button type="submit" className="btn btn-primary p-0 m-0 h-9 min-h-9 w-full">Save</button>
+              </div>
+            </div>
+            <div>
+             <VocabularyAssistant inputWord={editingWord?.english}/>
+            </div>
+          </form>
+        </div>
+      </dialog>
     </div>
   );
 }

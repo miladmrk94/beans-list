@@ -1,39 +1,60 @@
+import { useRef } from "react";
+
 export function usePronunciation() {
+  const audioCache = useRef({});
+
   const speakWord = async (word) => {
     try {
-      const API_KEY = 'AUC9q6lEMBcctHk7x4vpUjy7_rUliUi7vMYcb7vvKKsG';
-      const API_URL = 'https://api.eu-de.text-to-speech.watson.cloud.ibm.com/instances/25602067-0601-4e93-9200-0bc46112baa2/v1/synthesize';
+      if (audioCache.current[word]) {
+        audioCache.current[word].play();
+        return;
+      }
+
+      const API_KEY = "sk_47f51bc4f15fc72d13db62ad317f8ad7303c6dc8bb937d48";
+      const API_URL =
+        "https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL";
 
       const response = await fetch(API_URL, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Basic ${btoa(`apikey:${API_KEY}`)}`,
-          'Content-Type': 'application/json',
-          'Accept': 'audio/wav',
+          "xi-api-key": API_KEY,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           text: word,
-          //voice: 'en-US_AllisonV3Voice', // You can choose different voices
-          voice: 'en-US_EmmaExpressive', // You can choose different voices
-          accept: 'audio/wav',
-          gender: "female",
-         
-        })
+          model_id: "eleven_turbo_v2",
+        }),
       });
 
-      if (!response.ok) throw new Error('Watson API request failed');
+      if (!response.ok) throw new Error("API request failed");
 
       const audioBlob = await response.blob();
       const audio = new Audio(URL.createObjectURL(audioBlob));
+      audioCache.current[word] = audio;
       audio.play();
     } catch (error) {
-      console.error('Error with Watson TTS:', error);
-      // Fall back to browser's speech synthesis as last resort
+      console.error("Error with ElevenLabs TTS:", error);
+
       const utterance = new SpeechSynthesisUtterance(word);
-      utterance.lang = 'en-US';
+      utterance.lang = "en-US";
+
+      const voices = window.speechSynthesis.getVoices();
+
+      const markVoice = voices.find(
+        (voice) => voice.name === "Google US English"
+      );
+
+      if (markVoice) {
+        utterance.voice = markVoice;
+      }
+
+      utterance.pitch = 1;
+      utterance.rate = 1;
+      utterance.volume = 1;
+
       window.speechSynthesis.speak(utterance);
     }
   };
 
   return { speakWord };
-} 
+}

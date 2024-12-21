@@ -6,7 +6,6 @@ import { FileUploader } from "./components/FileUploader";
 import { WordsList } from "./components/WordsList";
 import Header from "./components/header";
 import NavigationBar from "./components/NavigationBar";
-import "./App.css";
 import VocabularyAssistant from "./components/VocabularyAssistant";
 
 function App() {
@@ -17,6 +16,7 @@ function App() {
     setHiddenMeanings,
     toggleMeaning,
     clearWordsList,
+    updateWord
   } = useWordsManager();
 
   const { speakWord } = usePronunciation();
@@ -51,23 +51,23 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen max-w-md mx-auto">
+    <div className=" max-w-md mx-auto bg-gray-700">
       <Header />
-
-      <div className="container mx-auto p-2 sm:p-4">
+      <div className="container mx-auto p-2 my-14 sm:p-4">
         <FileUploader
           onUpload={handleFileUpload}
           wordsList={wordsList}
           onClear={clearWordsList}
         />
-        <VocabularyAssistant/>
+        {/* <VocabularyAssistant/> */}
         <WordSorter sortType={sortType} setSortType={setSortType} />
-
         <WordsList
           words={getSortedWords()}
           hiddenMeanings={hiddenMeanings}
           onToggleMeaning={toggleMeaning}
           onSpeak={speakWord}
+          onUpdateWord={updateWord}  // Add this prop
+
         />
       </div>
       <NavigationBar />
