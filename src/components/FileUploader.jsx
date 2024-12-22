@@ -14,7 +14,8 @@ export function FileUploader({ onUpload, wordsList, onClear }) {
       const formattedData = data.map((row, index) => ({
         id: index + 1,
         english: row.english || row.English || '',
-        farsi: row.farsi || row.Farsi || ''
+        farsi: row.farsi || row.Farsi || '',
+        addedAt: Date.now()
       }));
 
       onUpload(formattedData);

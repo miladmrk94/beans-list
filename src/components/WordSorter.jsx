@@ -1,6 +1,8 @@
 export function WordSorter({ sortType, setSortType }) {
   const sortButtons = [
     { type: 'default', label: 'Default' },
+    { type: 'newest', label: 'Newest First' },
+    { type: 'oldest', label: 'Oldest First' },
     { type: 'alpha', label: 'A to Z' },
     { type: 'alphaReverse', label: 'Z to A' },
     { type: 'length', label: 'Shortest First' },

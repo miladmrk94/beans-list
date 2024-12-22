@@ -25,6 +25,19 @@ export function WordsList({ words, hiddenMeanings, onToggleMeaning, onSpeak, onU
     document.getElementById("my_modal_3").close();
   };
 
+  const handleAddWord = (e) => {
+    e.preventDefault();
+    const newWord = {
+      id: Math.max(...words.map(w => w.id), 0) + 1,
+      english: e.target.english.value,
+      farsi: e.target.farsi.value,
+      addedAt: Date.now()
+    };
+    onUpdateWord(newWord);
+    document.getElementById("my_modal_3").close();
+    e.target.reset();
+  };
+
   if (words.length === 0) {
     return (
       <div className="text-center text-gray-400 mt-8">
@@ -36,6 +49,17 @@ export function WordsList({ words, hiddenMeanings, onToggleMeaning, onSpeak, onU
 
   return (
     <div className="max-w-2xl mx-auto">
+      <button
+        onClick={() => {
+          setEditingWord(null);
+          document.getElementById("my_modal_3").showModal();
+        }}
+        className="w-full mb-4 px-4 py-2 bg-success hover:bg-success/80 text-white rounded-lg
+                   text-sm font-medium transition-colors duration-200"
+      >
+        Add New Word
+      </button>
+
       {words.map((word) => (
         <div
           key={word.id}
@@ -74,12 +98,17 @@ export function WordsList({ words, hiddenMeanings, onToggleMeaning, onSpeak, onU
 
       <dialog id="my_modal_3" className="modal modal-bottom">
         <div className="modal-box p-2">
-          <form onSubmit={handleSave}>
-            <button type="button" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                    onClick={() => document.getElementById("my_modal_3").close()}>
+          <form onSubmit={editingWord ? handleSave : handleAddWord}>
+            <button
+              type="button"
+              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              onClick={() => document.getElementById("my_modal_3").close()}
+            >
               ✕
             </button>
-            <h3 className="font-bold text-lg mb-2">Edit Word</h3>
+            <h3 className="font-bold text-lg mb-2">
+              {editingWord ? "Edit Word" : "Add New Word"}
+            </h3>
             <div className="space-y-4">
               <div className="flex gap-2 ">
                 <label className="label">

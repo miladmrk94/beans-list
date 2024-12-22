@@ -43,9 +43,12 @@ export function useWordsManager() {
   };
 
   const updateWord = (updatedWord) => {
-    const newWordsList = wordsList.map(word => 
-      word.id === updatedWord.id ? updatedWord : word
-    );
+    const newWordsList = updatedWord.id > wordsList.length 
+      ? [...wordsList, updatedWord]
+      : wordsList.map(word =>     
+          word.id === updatedWord.id ? updatedWord : word
+        );
+    
     setWordsList(newWordsList);
     localStorage.setItem('wordsList', JSON.stringify(newWordsList));
   };

@@ -37,13 +37,17 @@ function App() {
   const getSortedWords = () => {
     const words = [...wordsList];
     switch (sortType) {
-      case "alpha":
+      case 'newest':
+        return words.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+      case 'oldest':
+        return words.sort((a, b) => (a.addedAt || 0) - (b.addedAt || 0));
+      case 'alpha':
         return words.sort((a, b) => a.english.localeCompare(b.english));
-      case "alphaReverse":
+      case 'alphaReverse':
         return words.sort((a, b) => b.english.localeCompare(a.english));
-      case "length":
+      case 'length':
         return words.sort((a, b) => a.english.length - b.english.length);
-      case "lengthReverse":
+      case 'lengthReverse':
         return words.sort((a, b) => b.english.length - a.english.length);
       default:
         return words;
