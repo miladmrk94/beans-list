@@ -96,8 +96,8 @@ export function WordsList({ words, hiddenMeanings, onToggleMeaning, onSpeak, onU
         </div>
       ))}
 
-      <dialog id="my_modal_3" className="modal modal-bottom">
-        <div className="modal-box p-2">
+      <dialog id="my_modal_3" className="modal modal-bottom max-w-md mx-auto backdrop-blur-sm">
+        <div className="modal-box p-2 ">
           <form onSubmit={editingWord ? handleSave : handleAddWord}>
             <button
               type="button"
@@ -136,9 +136,9 @@ export function WordsList({ words, hiddenMeanings, onToggleMeaning, onSpeak, onU
                 <button type="submit" className="btn btn-primary p-0 m-0 h-9 min-h-9 w-full">Save</button>
               </div>
             </div>
-            <div>
+            {/* <div>
              <VocabularyAssistant inputWord={editingWord?.english}/>
-            </div>
+            </div> */}
           </form>
         </div>
       </dialog>
