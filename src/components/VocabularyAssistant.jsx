@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SparklesIcon } from "@heroicons/react/24/outline";
 
 function extractTextAsObject(apiResponse) {
@@ -21,6 +21,12 @@ const VocabularyAssistant = ({ inputWord }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [content, setContent] = useState("");
   const [showContent, setShowContent] = useState(false);
+
+  useEffect(() => {
+    setContent("");
+    setShowContent(false);
+    setIsGenerating(false);
+  }, [inputWord]);
 
   const handleGenerate = async () => {
     if (!inputWord) return;
@@ -55,47 +61,25 @@ const VocabularyAssistant = ({ inputWord }) => {
   };
 
   return (
-    <div className="max-w-md ">
-      <h3 className="font-bold text-lg my-2">✨ AI Generated</h3>
-
+    <div className="max-w-md flex flex-col gap-4">
       <button
         type="button"
         disabled={isGenerating}
         onClick={handleGenerate}
-        className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 px-4 py-1.5 text-white shadow-lg transition-all duration-300 hover:from-purple-500 hover:to-indigo-500 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
+        className={`w-full shadow__btn ${
+          isGenerating ? "shadow__btn__active" : ""
+        } text-sm`}
       >
-        {/* Shine effect */}
-        <div className="absolute inset-0 flex translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000">
-          <div className="h-full w-1/3 rotate-12 transform bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        </div>
-
-        {/* Sparkles background */}
-        <div className="absolute inset-0 opacity-20">
-          <div
-            className="absolute h-4 w-4 rounded-full bg-white animate-sparkle"
-            style={{ left: "10%", top: "30%" }}
-          />
-          <div
-            className="absolute h-4 w-4 rounded-full bg-white animate-sparkle"
-            style={{ left: "70%", top: "60%" }}
-          />
-          <div
-            className="absolute h-4 w-4 rounded-full bg-white animate-sparkle"
-            style={{ left: "40%", top: "50%" }}
-          />
-        </div>
-
         {/* Button content */}
         <div className="relative flex items-center justify-center gap-2">
           {isGenerating ? (
             <>
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              <span>Generating Magic ✨...</span>
+              <span>✨ Generating Magic ...</span>
             </>
           ) : (
             <>
-              <SparklesIcon className="h-4 w-4" />
-              <span>Generate More Meanings ✨</span>
+              <span>✨ AI Generate More Details </span>
             </>
           )}
           <div
@@ -105,32 +89,61 @@ const VocabularyAssistant = ({ inputWord }) => {
           ></div>
         </div>
       </button>
-      <div>
-     {JSON.stringify(content)},
-    
-      </div>
+      {content && !loading && (
+        <div className="flex flex-col gap-3 h-[300px] overflow-y-auto p-4">
+          <div className="space-y-2">
+            <h4 className="font-medium">Additional Information</h4>
+            <div className="bg-base-200 rounded-lg p-3 ">
+              <p className="text-sm flex flex-col">
+                <span className="font-extrabold text-indigo-400">
+                  explanation:
+                </span>{" "}
+                <span>{content.explanation}</span>
+              </p>
+            </div>
+            <div className="bg-base-200 rounded-lg p-3 ">
+              <p className="text-sm flex flex-col">
+                <span className="font-extrabold text-indigo-400">
+                  Part of speech:
+                </span>{" "}
+                <span>{content.ipa}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-base-200 rounded-lg p-3 space-y-1">
+            <span className="font-extrabold text-indigo-400">
+              Examples in Sentences:
+            </span>{" "}
+            <ul className="list-disc list-inside space-y-1 text-sm text-base-content/80">
+              {content.example_sentences.map((item, index) => {
+               return<li key={index}>{item}</li>;
+              })}
+       
+            </ul>
+          </div>
+        </div>
+      )}
 
       <style jsx global>{`
-        @keyframes sparkle {
-          0%,
-          100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.5;
-            transform: scale(0.5);
-          }
+        .shadow__btn {
+          padding: 10px 20px;
+          border: none;
+          color: #fff;
+          border-radius: 7px;
+          font-weight: 500;
+          transition: 0.5s;
+          transition-property: box-shadow;
         }
-        .animate-sparkle {
-          animation: sparkle 2s infinite;
-          animation-delay: var(--delay, 0ms);
+
+        .shadow__btn {
+          background: rgb(0, 140, 255);
+          box-shadow: 0 0 25px rgb(0, 140, 255);
         }
-        .animate-sparkle:nth-child(2) {
-          --delay: 400ms;
-        }
-        .animate-sparkle:nth-child(3) {
-          --delay: 800ms;
+
+        .shadow__btn__active {
+          box-shadow: 0 0 5px rgb(0, 140, 255), 0 0 25px rgb(0, 140, 255),
+            0 0 30px rgb(0, 140, 255), 0 0 60px rgb(0, 140, 255);
         }
       `}</style>
     </div>

@@ -6,11 +6,20 @@ import { EyeDropperIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import VocabularyAssistant from "./VocabularyAssistant";
 
-export function WordsList({ words, hiddenMeanings, onToggleMeaning, onSpeak, onUpdateWord }) {
+export function WordsList({
+  words,
+  hiddenMeanings,
+  onToggleMeaning,
+  onSpeak,
+  onUpdateWord,
+}) {
   const [editingWord, setEditingWord] = useState(null);
+  const [showAIDetails, setShowAIDetails] = useState(false);
+  const [vocabularyKey, setVocabularyKey] = useState(0);
 
   const handleWordClick = (word) => {
     setEditingWord(word);
+    setVocabularyKey(prev => prev + 1);
     document.getElementById("my_modal_3").showModal();
   };
 
@@ -28,10 +37,10 @@ export function WordsList({ words, hiddenMeanings, onToggleMeaning, onSpeak, onU
   const handleAddWord = (e) => {
     e.preventDefault();
     const newWord = {
-      id: Math.max(...words.map(w => w.id), 0) + 1,
+      id: Math.max(...words.map((w) => w.id), 0) + 1,
       english: e.target.english.value,
       farsi: e.target.farsi.value,
-      addedAt: Date.now()
+      addedAt: Date.now(),
     };
     onUpdateWord(newWord);
     document.getElementById("my_modal_3").close();
@@ -96,49 +105,76 @@ export function WordsList({ words, hiddenMeanings, onToggleMeaning, onSpeak, onU
         </div>
       ))}
 
-      <dialog id="my_modal_3" className="modal modal-bottom max-w-md mx-auto backdrop-blur-sm">
-        <div className="modal-box p-2 ">
-          <form onSubmit={editingWord ? handleSave : handleAddWord}>
-            <button
-              type="button"
-              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              onClick={() => document.getElementById("my_modal_3").close()}
-            >
-              ✕
-            </button>
-            <h3 className="font-bold text-lg mb-2">
-              {editingWord ? "Edit Word" : "Add New Word"}
-            </h3>
-            <div className="space-y-4">
-              <div className="flex gap-2 ">
+      <dialog id="my_modal_3" className="modal modal-bottom sm:modal-middle">
+        <div className="modal-box max-w-md p-0 overflow-hidden">
+          <div className="p-4 border-b border-base-200">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">
+                {editingWord ? "Edit Word" : "Add New Word"}
+              </h3>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm btn-square"
+                onClick={() => document.getElementById("my_modal_3").close()}
+              >
+                X
+              </button>
+            </div>
+          </div>
+
+          <form
+            onSubmit={editingWord ? handleSave : handleAddWord}
+            className="p-4 space-y-4"
+          >
+            <div className="flex flex-col gap-4">
+              <div className="form-control">
                 <label className="label">
-                  <span className="label-text w-14">English</span>
+                  <span className="label-text">Word</span>
                 </label>
                 <input
                   type="text"
                   name="english"
-                  className="input input-bordered w-full h-9"
+                  className="input input-bordered w-full"
                   defaultValue={editingWord?.english}
                 />
               </div>
-              <div className="flex gap-2 ">
+
+              <div className="form-control">
                 <label className="label">
-                  <span className="label-text w-14">Farsi</span>
+                  <span className="label-text">Translation</span>
                 </label>
                 <input
                   type="text"
                   name="farsi"
-                   className="input input-bordered w-full h-9"
+                  className="input input-bordered w-full font-farsi"
                   defaultValue={editingWord?.farsi}
+                  dir="rtl"
                 />
               </div>
-              <div className="modal-action">
-                <button type="submit" className="btn btn-primary p-0 m-0 h-9 min-h-9 w-full">Save</button>
+
+              <div className="  rounded-lg mt-4">
+                <VocabularyAssistant 
+                  key={vocabularyKey} 
+                  inputWord={editingWord?.english} 
+                />
               </div>
             </div>
-            {/* <div>
-             <VocabularyAssistant inputWord={editingWord?.english}/>
-            </div> */}
+
+            <div className="flex gap-2 pt-4">
+              <button
+                type="button"
+                className="btn flex-1"
+                onClick={() => {
+                  document.getElementById("my_modal_3").close();
+                  setVocabularyKey(prev => prev + 1);
+                }}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary flex-1 ">
+                {editingWord ? "Save Changes" : "Add Word"}
+              </button>
+            </div>
           </form>
         </div>
       </dialog>
