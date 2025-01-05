@@ -55,9 +55,9 @@ function App() {
   };
 
   return (
-    <div className=" max-w-md mx-auto bg-gray-700">
+    <div className=" max-w-md mx-auto bg-[#323841] ">
       <Header />
-      <div className="container mx-auto p-2 my-14 sm:p-4">
+      <div className="container mx-auto  my-14 sm:p-4">
         <FileUploader
           onUpload={handleFileUpload}
           wordsList={wordsList}
