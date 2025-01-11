@@ -14,7 +14,9 @@
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "@heroicons/react": "^2.2.0",
+    "@tanstack/react-virtual": "^3.11.2",
     "elevenlabs": "^1.50.2",
+    "lodash": "^4.17.21",
     "motion": "^11.15.0",
     "openai": "^4.77.3",
     "outetts": "^0.2.0",

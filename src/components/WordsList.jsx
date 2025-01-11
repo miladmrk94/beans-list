@@ -3,9 +3,13 @@ import {
   SpeakerWaveIcon,
 } from "@heroicons/react/24/outline";
 import { EyeDropperIcon } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import VocabularyAssistant from "./VocabularyAssistant";
 import { useIndexedDBStore } from "use-indexeddb";
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { debounce } from 'lodash';
+
+const ITEMS_PER_PAGE = 50;
 
 export function WordsList({
   words,
@@ -18,11 +22,29 @@ export function WordsList({
   const [editingWord, setEditingWord] = useState(null);
   const [showAIDetails, setShowAIDetails] = useState(false);
   const [vocabularyKey, setVocabularyKey] = useState(0);
+  const parentRef = useRef(null);
+  const [page, setPage] = useState(1);
+  const [loadedWords, setLoadedWords] = useState([]);
 
-  const handleWordClick = (word) => {
+  useEffect(() => {
+    setLoadedWords(words.slice(0, page * ITEMS_PER_PAGE));
+  }, [words, page]);
+
+  const rowVirtualizer = useVirtualizer({
+    count: words.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 56, // height of each row (14 * 4)
+    overscan: 5
+  });
+
+  const debouncedHandleWordClick = debounce((word) => {
     setEditingWord(word);
     setVocabularyKey((prev) => prev + 1);
     document.getElementById("my_modal_3").showModal();
+  }, 300);
+
+  const handleWordClick = (word) => {
+    debouncedHandleWordClick(word);
   };
 
   const handleSave = async (e) => {
@@ -50,6 +72,13 @@ export function WordsList({
     e.target.reset();
   };
 
+  const handleScroll = (e) => {
+    const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
+    if (bottom && loadedWords.length < words.length) {
+      setPage(prev => prev + 1);
+    }
+  };
+
   if (words.length === 0) {
     return (
       <div className="text-center text-gray-400 mt-8">
@@ -73,42 +102,65 @@ export function WordsList({
           Add New Word
         </button>
       </div>
-      <div className=" rounded-xl bg-[#374151] overflow-hidden mx-3">
-        {words.map((word) => (
-          <div
-            key={word.id}
-            className="  p-2 flex items-center justify-between
-                    hover:bg-gray-750 transition-all border-t-[1px] border-white border-opacity-5 h-14 overflow-hidden"
-          >
-            <div className="flex-1 grid grid-cols-[1fr,auto,1fr] gap-4 items-center">
-              <span
-                onClick={() => handleWordClick(word)}
-                className="text-gray-100 text-sm text-left cursor-pointer hover:underline"
-              >
-                {word.english}
-              </span>
-
-              <button
-                onClick={() => onSpeak(word.english)}
-                className="flex items-center justify-center w-8 h-8 opacity-60 hover:opacity-100 group"
-                aria-label="Play pronunciation"
-              >
-                <SpeakerWaveIcon className="size-5 transition-transform duration-200 group-active:scale-90 hover:scale-110" />
-              </button>
-
+      <div 
+        ref={parentRef}
+        className="rounded-xl bg-[#374151] overflow-auto mx-3"
+        style={{ height: 'calc(100vh - 250px)' }} // Adjust based on your needs
+        onScroll={handleScroll}
+      >
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const word = words[virtualRow.index];
+            return (
               <div
-                className="text-gray-100 text-sm flex justify-end text-right"
-                onClick={() => onToggleMeaning(word.id)}
+                key={word.id}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: `${virtualRow.size}px`,
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+                className="p-2 flex items-center justify-between hover:bg-gray-750 transition-all border-t-[1px] border-white border-opacity-5 h-14 overflow-hidden"
               >
-                {hiddenMeanings[word.id] ? (
-                  <EllipsisHorizontalIcon className="size-5" />
-                ) : (
-                  <span className="text-gray-100">{word.farsi}</span>
-                )}
+                <div className="flex-1 grid grid-cols-[1fr,auto,1fr] gap-4 items-center">
+                  <span
+                    onClick={() => handleWordClick(word)}
+                    className="text-gray-100 text-sm text-left cursor-pointer hover:underline"
+                  >
+                    {word.english}
+                  </span>
+
+                  <button
+                    onClick={() => onSpeak(word.english)}
+                    className="flex items-center justify-center w-8 h-8 opacity-60 hover:opacity-100 group"
+                    aria-label="Play pronunciation"
+                  >
+                    <SpeakerWaveIcon className="size-5 transition-transform duration-200 group-active:scale-90 hover:scale-110" />
+                  </button>
+
+                  <div
+                    className="text-gray-100 text-sm flex justify-end text-right"
+                    onClick={() => onToggleMeaning(word.id)}
+                  >
+                    {hiddenMeanings[word.id] ? (
+                      <EllipsisHorizontalIcon className="size-5" />
+                    ) : (
+                      <span className="text-gray-100">{word.farsi}</span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
+            );
+          })}
+        </div>
       </div>
 
       <dialog id="my_modal_3" className="modal modal-bottom sm:modal-middle">

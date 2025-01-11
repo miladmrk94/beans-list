@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { SparklesIcon } from "@heroicons/react/24/outline";
 
 function extractTextAsObject(apiResponse) {
@@ -14,7 +14,7 @@ function extractTextAsObject(apiResponse) {
   }
 }
 
-const VocabularyAssistant = ({ inputWord }) => {
+const VocabularyAssistant = memo(({ inputWord }) => {
   const [output, setOutput] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -148,6 +148,6 @@ const VocabularyAssistant = ({ inputWord }) => {
       `}</style>
     </div>
   );
-};
+});
 
 export default VocabularyAssistant;
