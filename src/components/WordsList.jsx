@@ -5,6 +5,7 @@ import {
 import { EyeDropperIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import VocabularyAssistant from "./VocabularyAssistant";
+import { useIndexedDBStore } from "use-indexeddb";
 
 export function WordsList({
   words,
@@ -13,6 +14,7 @@ export function WordsList({
   onSpeak,
   onUpdateWord,
 }) {
+  const { add, update, getAll } = useIndexedDBStore("vocabulary");
   const [editingWord, setEditingWord] = useState(null);
   const [showAIDetails, setShowAIDetails] = useState(false);
   const [vocabularyKey, setVocabularyKey] = useState(0);
@@ -23,26 +25,27 @@ export function WordsList({
     document.getElementById("my_modal_3").showModal();
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     const updatedWord = {
       ...editingWord,
       english: e.target.english.value,
       farsi: e.target.farsi.value,
     };
+    await update(updatedWord);
     onUpdateWord(updatedWord);
     document.getElementById("my_modal_3").close();
   };
 
-  const handleAddWord = (e) => {
+  const handleAddWord = async (e) => {
     e.preventDefault();
     const newWord = {
-      id: Math.max(...words.map((w) => w.id), 0) + 1,
       english: e.target.english.value,
       farsi: e.target.farsi.value,
       addedAt: Date.now(),
     };
-    onUpdateWord(newWord);
+    const id = await add(newWord);
+    onUpdateWord({ ...newWord, id });
     document.getElementById("my_modal_3").close();
     e.target.reset();
   };

@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from 'react';
+import { useIndexedDBStore } from 'use-indexeddb';
+import { useInitializeDB } from './hooks/useInitializeDB';
 import { useWordsManager } from "./hooks/useWordsManager";
 import { usePronunciation } from "./hooks/usePronunciation";
 import { WordSorter } from "./components/WordSorter";
@@ -9,6 +11,25 @@ import NavigationBar from "./components/NavigationBar";
 import VocabularyAssistant from "./components/VocabularyAssistant";
 
 function App() {
+  const [words, setWords] = useState([]);
+  useInitializeDB();
+  const { getAll } = useIndexedDBStore("vocabulary");
+
+  useEffect(() => {
+    const loadWords = async () => {
+      const storedWords = await getAll();
+      setWords(storedWords);
+    };
+    loadWords();
+  }, [getAll]);
+
+  const handleUpdateWord = async (updatedWord) => {
+    setWords(prevWords => {
+      const newWords = prevWords.filter(w => w.id !== updatedWord.id);
+      return [...newWords, updatedWord].sort((a, b) => a.id - b.id);
+    });
+  };
+
   const {
     wordsList,
     setWordsList,
@@ -70,8 +91,7 @@ function App() {
           hiddenMeanings={hiddenMeanings}
           onToggleMeaning={toggleMeaning}
           onSpeak={speakWord}
-          onUpdateWord={updateWord}  // Add this prop
-
+          onUpdateWord={handleUpdateWord}
         />
       </div>
       <NavigationBar />
