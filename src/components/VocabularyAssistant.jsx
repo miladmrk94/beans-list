@@ -1,18 +1,18 @@
 import { useState, useEffect, memo } from "react";
 import { SparklesIcon } from "@heroicons/react/24/outline";
+import { OpenAI } from "openai";
 
-function extractTextAsObject(apiResponse) {
-  const text = apiResponse.candidates[0].content.parts[0].text;
-  const jsonText = text
-    .slice(text.indexOf("{"), text.lastIndexOf("}") + 1)
-    .trim();
-  try {
-    return JSON.parse(jsonText);
-  } catch (error) {
-    console.error("Error parsing JSON:", error);
-    return null;
-  }
-}
+// Initialize OpenAI client
+const openai = new OpenAI({
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey:
+    "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",
+  // defaultHeaders: {
+  //   "HTTP-Referer": "<YOUR_SITE_URL>", // Optional. Site URL for rankings on openrouter.ai.
+  //   "X-Title": "<YOUR_SITE_NAME>", // Optional. Site title for rankings on openrouter.ai.
+  // },
+  dangerouslyAllowBrowser: true, // Only use this for development/demo purposes
+});
 
 const VocabularyAssistant = memo(({ inputWord }) => {
   const [output, setOutput] = useState(null);
@@ -35,23 +35,56 @@ const VocabularyAssistant = memo(({ inputWord }) => {
     setOutput(null);
 
     try {
-      const response = await fetch("https://beansproxy.onrender.com/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ word: inputWord }),
+      const completion = await openai.chat.completions.create({
+        model: "google/gemini-2.0-flash-exp:free",
+        messages: [
+          {
+            role: "system",
+            content: `
+You are an advanced English language assistant specializing in vocabulary explanation and linguistic analysis. Your task is to analyze a given word or sentence and complete the following details:
+
+Explanation: Provide a very simple and concise explanation of the word or sentence's meaning in a maximum of 3 lines.
+IPA Transcription: Include its phonetic transcription in the International Phonetic Alphabet (IPA).
+Phonetic Transcription: Provide the pronunciation in English phonetic alphabet.
+Synonyms: List up to 5 synonyms (if applicable).
+Antonyms: List up to 5 antonyms (if applicable).
+Example Sentences: Write up to 3 short and simple example sentences showcasing the most common usage of the word or sentence.
+Format:
+Provide your response in the following JavaScript object structure:
+javascript Copy code
+{
+  "word": "example_word_or_sentence",
+  "explanation": "A simple explanation of the word or sentence in 3 lines maximum.",
+  "ipa": "IPA_transcription",
+  "Pronounce": "Persian_phonetic_transcription",
+  "synonyms": ["synonym1", "synonym2", "synonym3", "synonym4", "synonym5"],
+  "antonyms": ["antonym1", "antonym2", "antonym3", "antonym4", "antonym5"],
+  "example_sentences": [
+    "Example sentence 1.",
+    "Example sentence 2.",
+    "Example sentence 3."
+  ]
+}
+            
+            `,
+          },
+          {
+            role: "user",
+            content: inputWord,
+          },
+        ],
+        temperature: 0.7,
+        // max_tokens:500,
+        response_format: { type: "json_object" },
       });
+      const result = completion.choices[0].message.content;
+      const parsedResult = JSON.parse(result);
+      console.log("KHOOJI===>", result, parsedResult);
 
-      const result = await response.json();
-      console.log(extractTextAsObject(result));
-
-      setContent(extractTextAsObject(result));
-      setIsGenerating(false);
-      setShowContent(true);
-
-      // بررسی و نمایش پاسخ
-      setOutput(result.response ? result.response.text : "No result received.");
+      // setContent(parsedResult[0]);
+      // setIsGenerating(false);
+      // setShowContent(true);
+      // setOutput(result);
     } catch (error) {
       console.error("Error:", error);
       setOutput("An error occurred while generating the response.");
@@ -117,9 +150,8 @@ const VocabularyAssistant = memo(({ inputWord }) => {
             </span>{" "}
             <ul className="list-disc list-inside space-y-1 text-sm text-base-content/80">
               {content.example_sentences.map((item, index) => {
-               return<li key={index}>{item}</li>;
+                return <li key={index}>{item}</li>;
               })}
-       
             </ul>
           </div>
         </div>
@@ -149,5 +181,7 @@ const VocabularyAssistant = memo(({ inputWord }) => {
     </div>
   );
 });
+
+VocabularyAssistant.displayName = "VocabularyAssistant";
 
 export default VocabularyAssistant;
