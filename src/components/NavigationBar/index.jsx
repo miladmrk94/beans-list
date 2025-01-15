@@ -1,21 +1,25 @@
 import { PuzzlePieceIcon } from "@heroicons/react/24/outline";
 import { QueueListIcon } from "@heroicons/react/24/outline";
 import { CircleStackIcon } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
 
 const index = () => {
   return (
-    <div className="btm-nav  h-14">
-      <button className="text-success">
+    <div className="btm-nav h-14">
+      <Link to="/Profile" className="text-success">
         <CircleStackIcon className="size-6" />
-      </button>
-      <button className="text-success active">
+      </Link>
+      <Link to="/" className="text-success active">
         <QueueListIcon className="size-6" />
-      </button>
-      <button className="text-success">
+      </Link>
+      <Link to="/practice" className="text-success">
         <PuzzlePieceIcon className="size-6" />
-      </button>
+      </Link>
     </div>
   );
 };
+
+
+
 
 export default index;

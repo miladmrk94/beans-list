@@ -6,7 +6,7 @@ import { OpenAI } from "openai";
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey:
-    "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",
+    "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",
   // defaultHeaders: {
   //   "HTTP-Referer": "<YOUR_SITE_URL>", // Optional. Site URL for rankings on openrouter.ai.
   //   "X-Title": "<YOUR_SITE_NAME>", // Optional. Site title for rankings on openrouter.ai.
@@ -79,12 +79,13 @@ javascript Copy code
       });
       const result = completion.choices[0].message.content;
       const parsedResult = JSON.parse(result);
-      console.log("KHOOJI===>", result, parsedResult);
+      console.log("KHOOJI===>", typeof(parsedResult), parsedResult);
 
-      // setContent(parsedResult[0]);
-      // setIsGenerating(false);
-      // setShowContent(true);
-      // setOutput(result);
+      const contentData = Array.isArray(parsedResult) ? parsedResult[0] : parsedResult;
+      setContent(contentData);
+      setIsGenerating(false);
+      setShowContent(true);
+      setOutput(result);
     } catch (error) {
       console.error("Error:", error);
       setOutput("An error occurred while generating the response.");
