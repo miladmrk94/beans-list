@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import Practice from "./pages/Practice";
@@ -7,32 +7,49 @@ import Intro from "./pages/Intro";
 import NavigationBar from "./components/NavigationBar";
 import React from "react";
 
-function App({ initialShowIntro }) {
-  const [showIntro, setShowIntro] = React.useState(initialShowIntro);
-
-  const handleIntroComplete = () => {
-    localStorage.setItem('hasSeenIntro', 'true');
-    setShowIntro(false);
-  };
+function App() {
+  // Check if user has seen intro
+  const hasSeenIntro = localStorage.getItem('hasSeenIntro');
 
   return (
-    <BrowserRouter basename="/beans-list">
+    <BrowserRouter>
       <Routes>
-        <Route path="/intro" element={<Intro />} />
-        <Route
-          path="/*"
-          element={
+        {/* Redirect to intro if first visit */}
+        <Route path="/" element={
+          !hasSeenIntro ? <Navigate to="/intro" replace /> : (
             <>
               <Header />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/practice" element={<Practice />} />
-                <Route path="/Profile" element={<Profile />} />
-              </Routes>
+              <Home />
               <NavigationBar />
             </>
-          }
-        />
+          )
+        } />
+
+        {/* Intro page */}
+        <Route path="/intro" element={
+          hasSeenIntro ? <Navigate to="/" replace /> : <Intro />
+        } />
+
+        {/* Other routes */}
+        <Route path="/practice" element={
+          !hasSeenIntro ? <Navigate to="/intro" replace /> : (
+            <>
+              <Header />
+              <Practice />
+              <NavigationBar />
+            </>
+          )
+        } />
+        
+        <Route path="/profile" element={
+          !hasSeenIntro ? <Navigate to="/intro" replace /> : (
+            <>
+              <Header />
+              <Profile />
+              <NavigationBar />
+            </>
+          )
+        } />
       </Routes>
     </BrowserRouter>
   );
