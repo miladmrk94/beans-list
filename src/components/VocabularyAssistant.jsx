@@ -20,11 +20,9 @@ const VocabularyAssistant = memo(({ inputWord }) => {
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [content, setContent] = useState("");
-  const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
     setContent("");
-    setShowContent(false);
     setIsGenerating(false);
   }, [inputWord]);
 
@@ -84,7 +82,6 @@ javascript Copy code
       const contentData = Array.isArray(parsedResult) ? parsedResult[0] : parsedResult;
       setContent(contentData);
       setIsGenerating(false);
-      setShowContent(true);
       setOutput(result);
     } catch (error) {
       console.error("Error:", error);
@@ -95,32 +92,34 @@ javascript Copy code
   };
 
   return (
-    <div className="max-w-md flex flex-col gap-4">
+    <div className="max-w-2xl w-full flex flex-col gap-6">
       <button
         type="button"
         disabled={isGenerating}
         onClick={handleGenerate}
-        className={`w-full shadow__btn ${
-          isGenerating ? "shadow__btn__active" : ""
-        } text-sm`}
+        className={`w-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
+          text-lg font-medium py-4 rounded-xl border-2 border-indigo-500/20
+          bg-gradient-to-br from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600
+          shadow-lg hover:shadow-xl hover:-translate-y-0.5
+          ${isGenerating ? 'opacity-75 cursor-not-allowed' : ''}`}
+        aria-label={isGenerating ? "Generating content" : "Generate vocabulary details"}
       >
-        {/* Button content */}
-        <div className="relative flex items-center justify-center gap-2">
+        <div className="relative flex items-center justify-center gap-3">
           {isGenerating ? (
             <>
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              <span>✨ Generating Magic ...</span>
+              <div className="h-6 w-6 border-[3px] border-white/30 border-t-white animate-spin rounded-full" />
+              <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                Crafting Your Learning Guide...
+              </span>
             </>
           ) : (
-            <>
-              <span>✨ AI Generate More Details </span>
-            </>
+            <div className="flex items-center gap-2 group">
+              <SparklesIcon className="w-6 h-6 text-amber-300 transition-transform group-hover:rotate-12" />
+              <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                Generate Smart Study Notes
+              </span>
+            </div>
           )}
-          <div
-            className={`mt-4 overflow-hidden transition-all duration-500 ease-out ${
-              showContent ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-            }`}
-          ></div>
         </div>
       </button>
       {content && !loading && (
@@ -158,27 +157,6 @@ javascript Copy code
         </div>
       )}
 
-      <style jsx global>{`
-        .shadow__btn {
-          padding: 10px 20px;
-          border: none;
-          color: #fff;
-          border-radius: 7px;
-          font-weight: 500;
-          transition: 0.5s;
-          transition-property: box-shadow;
-        }
-
-        .shadow__btn {
-          background: rgb(0, 140, 255);
-          box-shadow: 0 0 25px rgb(0, 140, 255);
-        }
-
-        .shadow__btn__active {
-          box-shadow: 0 0 5px rgb(0, 140, 255), 0 0 25px rgb(0, 140, 255),
-            0 0 30px rgb(0, 140, 255), 0 0 60px rgb(0, 140, 255);
-        }
-      `}</style>
     </div>
   );
 });
